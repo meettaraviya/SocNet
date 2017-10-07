@@ -22,13 +22,21 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 
+import javax.net.ssl.HttpsURLConnection;
+
 /**
  * Created by hell-raiser on 4/10/17.
  */
 
 public class RequestHandler {
 
-    private static String getQuery(HashMap<String,String> params) throws UnsupportedEncodingException {
+    private boolean storeCookie;
+    private HashMap<String, String> cookieMap;
+    public RequestHandler(){
+        storeCookie = false;
+        cookieMap = null;
+    }
+    private String getQuery(HashMap<String,String> params) throws UnsupportedEncodingException {
         StringBuilder result = new StringBuilder();
         boolean first = true;
 
@@ -46,8 +54,31 @@ public class RequestHandler {
 
         return result.toString();
     }
+    public void doStoreCookie(boolean storeCookie) {
+        this.storeCookie = storeCookie;
+        this.cookieMap = new HashMap<String,String>();
+    }
+    private void storeCookieMap(HttpURLConnection conn) {
+        if (conn == null)
+            return;
+        String headerName = null;
+        for (int i=0; (headerName = conn.getHeaderFieldKey(i)) != null; i++) {
+            if (headerName.equals("Set-Cookie")){
+                String cookie = conn.getHeaderField(i);
+                cookie = cookie.substring(0, cookie.indexOf(";"));
+                String cookieName = cookie.substring(0, cookie.indexOf("="));
+                String cookieValue = cookie.substring(cookie.indexOf("=") + 1, cookie.length());
+                cookieMap.put(cookieName,cookieValue);
 
-    public static JSONObject handle(String location, String method, HashMap<String,String> params){
+            }
+        }
+
+    }
+    public String getCookie(String cookieName) {
+        String cookieValue = cookieMap.get(cookieName);
+        return cookieValue;
+    }
+    public JSONObject handle(String location, String method, HashMap<String,String> params){
         URL url = null;
         HttpURLConnection conn = null;
         JSONObject response = null;
@@ -77,6 +108,10 @@ public class RequestHandler {
             while ((line = r.readLine()) != null) {
                 total.append(line).append('\n');
             }
+            if (storeCookie) {
+                storeCookieMap(conn);
+            }
+
             response = new JSONObject(total.toString());
             Log.i("Response", response.toString());
         } catch (MalformedURLException e) {

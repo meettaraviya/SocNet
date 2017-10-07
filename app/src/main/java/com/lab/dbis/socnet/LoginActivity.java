@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,13 +30,18 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -297,10 +303,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
+        public String SessionID;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
+            SessionID = null;
         }
 
         @Override
@@ -309,13 +317,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             HashMap<String,String> paramsMap = new HashMap<>();
             paramsMap.put("id", mEmail);
             paramsMap.put("password",mPassword);
-            JSONObject response = RequestHandler.handle(getString(R.string.base_url)+"Login", "POST", paramsMap);
+            RequestHandler requestHandler = new RequestHandler();
+            requestHandler.doStoreCookie(true);
+            JSONObject response = requestHandler.handle(getString(R.string.URL_LOGIN),"POST", paramsMap);
+            SessionID = requestHandler.getCookie("JSESSIONID");
             try {
                 return response.getBoolean("status");
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (NullPointerException e){
-//                TODO: Toast.makeText(getApplicationContext(),"You are not connected to the internet",Toast.LENGTH_SHORT).show();
+                //TODO: Toast.makeText(getApplicationContext(),"You are not connected to the internet",Toast.LENGTH_SHORT).show();
             }
             return false;
 
@@ -328,7 +339,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             if (success) {
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.putExtra("id", mEmail);
+                intent.putExtra("SessionID", SessionID);
+                Log.i("JSESSIONID", SessionID);
                 startActivity(intent);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
