@@ -62,8 +62,7 @@ public class RequestHandler {
             if(method.equals("POST") && params!=null){
                 conn.setDoOutput(true);
                 OutputStream os = conn.getOutputStream();
-                BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(os, "UTF-8"));
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
                 writer.write(getQuery(params));
                 writer.flush();
                 writer.close();

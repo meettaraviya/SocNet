@@ -22,10 +22,7 @@ public class NewPostFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        TextView textView = new TextView(getActivity());
-        textView.setText(R.string.hello_blank_fragment);
-        return textView;
-        // TODO: Set button onclicklisteners
+        return inflater.inflate(R.layout.fragment_new_post, container, false);
     }
 
 }
