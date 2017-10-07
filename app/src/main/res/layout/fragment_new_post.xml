@@ -23,14 +23,14 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/button_cancel_new_post"
+                android:id="@+id/button_post_new_post"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.50"
                 android:text="Post" />
 
             <Button
-                android:id="@+id/button_post_new_post"
+                android:id="@+id/button_cancel_new_post"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.50"

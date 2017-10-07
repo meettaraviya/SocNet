@@ -17,6 +17,9 @@ import android.view.MenuItem;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private Bundle bundle;
+    private String SessionID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +51,11 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        SessionID = getIntent().getStringExtra("SessionID");
+        bundle = new Bundle();
+        bundle.putString("SessionID",SessionID);
+
     }
 
     @Override
@@ -94,12 +102,14 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.menu_item_newpost) {
             NewPostFragment newFragment = new NewPostFragment();
+            newFragment.setArguments(bundle);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_placeholder, newFragment);
             transaction.addToBackStack(null);
             transaction.commit();
         } else if (id == R.id.menu_item_search) {
             SearchFragment newFragment = new SearchFragment();
+            newFragment.setArguments(bundle);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_placeholder, newFragment);
             transaction.addToBackStack(null);

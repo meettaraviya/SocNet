@@ -22,8 +22,7 @@
                 android:id="@+id/multiAutoCompleteTextView3"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="MultiAutoCompleteTextView" />
+                android:layout_weight="1" />
 
             <ImageButton
                 android:id="@+id/imageButton"
