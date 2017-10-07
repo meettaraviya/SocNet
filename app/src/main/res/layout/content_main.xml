@@ -8,4 +8,7 @@
     tools:context="com.lab.dbis.socnet.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+    <FrameLayout android:id="@+id/fragment_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </android.support.constraint.ConstraintLayout>

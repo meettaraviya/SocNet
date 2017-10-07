@@ -30,7 +30,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -192,7 +196,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() > 0;
     }
 
     /**
@@ -301,9 +305,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            return true;
-            // TODO: Revert to below
-            /*
+
             HashMap<String,String> paramsMap = new HashMap<>();
             paramsMap.put("id", mEmail);
             paramsMap.put("password",mPassword);
@@ -316,7 +318,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 //                TODO: Toast.makeText(getApplicationContext(),"You are not connected to the internet",Toast.LENGTH_SHORT).show();
             }
             return false;
-            */
+
         }
 
         @Override
@@ -325,8 +327,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                // TODO: new activity here
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                intent.putExtra("id", mEmail);
                 startActivity(intent);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
