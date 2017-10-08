@@ -1,14 +1,24 @@
 package com.lab.dbis.socnet;
 
 import android.content.Context;
+import android.os.AsyncTask;
+import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -44,12 +54,13 @@ public class PostListAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater)context.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.list_item_post, parent, false);
+            convertView = inflater.inflate(R.layout.list_group, parent, false);
         }
         Post post = postList.get(groupPosition);
         TextView postUserName = (TextView) convertView.findViewById(R.id.text_post_name);
         TextView postTimestamp = (TextView) convertView.findViewById(R.id.text_post_timestamp);
         TextView postContent = (TextView) convertView.findViewById(R.id.text_post_content);
+        final EditText editTextComment = (EditText) convertView.findViewById(R.id.edittext_post_new_comment);
         Button buttonViewComments = (Button) convertView.findViewById(R.id.button_post_view_comments);
         Button buttonAddComment = (Button) convertView.findViewById(R.id.button_post_add_comment);
 
@@ -63,6 +74,18 @@ public class PostListAdapter extends BaseExpandableListAdapter {
                     ((ExpandableListView) parent).collapseGroup(groupPosition);
                 else
                     ((ExpandableListView) parent).expandGroup(groupPosition,false);
+                editTextComment.setText("");
+            }
+        });
+        buttonAddComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String content = editTextComment.getText().toString();
+                String postid = postList.get(groupPosition).getId();
+                if (content.equals(""))
+                    return;
+                AddCommentTask addCommentTask = new AddCommentTask(SessionID,postid,content);
+                addCommentTask.execute((Void) null);
             }
         });
 
@@ -104,4 +127,49 @@ public class PostListAdapter extends BaseExpandableListAdapter {
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return false;
     }
+    private class AddCommentTask extends AsyncTask<Void, Void, Boolean> {
+        private final String SessionID;
+        private final String postid;
+        private final String content;
+        private JSONObject response;
+
+        AddCommentTask(String SessionID, String postid, String content) {
+            this.SessionID = SessionID;
+            this.content = content;
+            this.postid = postid;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            HashMap<String, String> paramsMap = new HashMap<>();
+            paramsMap.put("postid",postid);
+            paramsMap.put("content",content);
+            RequestHandler requestHandler = new RequestHandler();
+            requestHandler.setSessionID(SessionID);
+            response = requestHandler.handle(context.getString(R.string.base_url)+"NewComment", "POST", paramsMap);
+            try {
+                return response.getBoolean("status");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (NullPointerException e){
+                e.printStackTrace();
+            }
+            return false;
+        }
+
+        @Override
+        protected  void onPostExecute(final Boolean success) {
+            if (success) {
+
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+
+    }
+
+
 }
