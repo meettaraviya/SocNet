@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">SocNet</string>
-
+    <string name="action_settings">Settings</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Username</string>
     <string name="prompt_password">Password</string>
@@ -12,7 +12,7 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="base_url">http://192.168.0.113:8080/SocNet/</string>
+    <string name="base_url">http://192.168.0.8:8080/SocNet/</string>
     <string name="title_activity_main">MainActivity</string>
     <!--<string name="title_home">Home</string>-->
     <!--<string name="title_dashboard">Dashboard</string>-->
@@ -22,6 +22,9 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
     <!--Strings related to SearchFragment -->
