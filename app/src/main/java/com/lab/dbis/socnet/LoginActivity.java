@@ -35,13 +35,9 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -65,6 +61,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    public void toast(final String msg, final int duration){
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(LoginActivity.this, msg, duration).show();
+
+            }
+        });
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -303,12 +308,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
-        public String SessionID;
+        private String sessionID;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
-            SessionID = null;
+            sessionID = null;
         }
 
         @Override
@@ -319,14 +324,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             paramsMap.put("password",mPassword);
             RequestHandler requestHandler = new RequestHandler();
             requestHandler.doStoreCookie(true);
-            JSONObject response = requestHandler.handle(getString(R.string.URL_LOGIN),"POST", paramsMap);
-            SessionID = requestHandler.getCookie("JSESSIONID");
+            JSONObject response = requestHandler.handle(getString(R.string.base_url)+"Login","POST", paramsMap);
+            sessionID = requestHandler.getCookie("JSESSIONID");
             try {
                 return response.getBoolean("status");
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (NullPointerException e){
-                //TODO: Toast.makeText(getApplicationContext(),"You are not connected to the internet",Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+                LoginActivity.this.toast("You are not connected to internet.", Toast.LENGTH_SHORT);
             }
             return false;
 
@@ -339,11 +345,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             if (success) {
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.putExtra("SessionID", SessionID);
-                Log.i("JSESSIONID", SessionID);
+                intent.putExtra("sessionID", sessionID);
+                Log.i("JSESSIONID", sessionID);
                 startActivity(intent);
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                LoginActivity.this.toast("Incorrect credentials", Toast.LENGTH_SHORT);
                 mPasswordView.requestFocus();
             }
         }

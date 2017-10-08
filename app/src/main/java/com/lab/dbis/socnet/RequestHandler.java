@@ -79,14 +79,14 @@ public class RequestHandler {
         return cookieValue;
     }
     public JSONObject handle(String location, String method, HashMap<String,String> params){
-        URL url = null;
+        URL url;
         HttpURLConnection conn = null;
         JSONObject response = null;
         try {
             url = new URL(location);
             conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(1000);
-            conn.setConnectTimeout(2000);
+            conn.setConnectTimeout(10000);
             conn.setRequestMethod(method);
             conn.setDoInput(true);
 
