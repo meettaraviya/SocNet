@@ -1,9 +1,14 @@
 package com.lab.dbis.socnet;
 
+import android.text.format.DateUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,9 +27,20 @@ public class Post {
     public Post(JSONObject postObj) throws JSONException {
         id = postObj.getString("uid");
         name = postObj.getString("name");
-        timestamp = postObj.getString("timestamp");
+
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            long time = sdf.parse(postObj.getString("timestamp")).getTime();
+            long now = System.currentTimeMillis();
+            timestamp = DateUtils.getRelativeTimeSpanString(time, now, DateUtils.MINUTE_IN_MILLIS).toString();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            timestamp = postObj.getString("timestamp");
+        }
+
         content = postObj.getString("text");
         JSONArray jsonCommentArray = postObj.getJSONArray("Comment");
+        commentList = new ArrayList<Comment>();
         for(int i=0; i<jsonCommentArray.length();i++)
             commentList.add(new Comment(jsonCommentArray.getJSONObject(i)));
     }

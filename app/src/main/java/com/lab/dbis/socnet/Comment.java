@@ -1,8 +1,13 @@
 package com.lab.dbis.socnet;
 
+import android.text.format.DateUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  * Created by harshdepal on 8/10/17.
@@ -16,11 +21,19 @@ public class Comment {
     public Comment() {
 
     }
-    public Comment(JSONObject postObj) throws JSONException {
-        id = postObj.getString("uid");
-        name = postObj.getString("name");
-        timestamp = postObj.getString("timestamp");
-        content = postObj.getString("text");
+    public Comment(JSONObject commentObj) throws JSONException {
+        id = commentObj.getString("uid");
+        name = commentObj.getString("name");
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            long time = sdf.parse(commentObj.getString("timestamp")).getTime();
+            long now = System.currentTimeMillis();
+            timestamp = DateUtils.getRelativeTimeSpanString(time, now, DateUtils.MINUTE_IN_MILLIS).toString();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            timestamp = commentObj.getString("timestamp");
+        }
+        content = commentObj.getString("text");
     }
     public String getName() {
         return name;

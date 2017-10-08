@@ -1,7 +1,6 @@
 package com.lab.dbis.socnet;
 
 import android.content.Context;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +28,7 @@ public class PostListAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater)context.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.list_item, parent, false);
+            convertView = inflater.inflate(R.layout.list_item_comment, parent, false);
         }
         Comment comment = postList.get(groupPosition).getComment(childPosition);
         TextView commentUserName = (TextView) convertView.findViewById(R.id.text_comment_name);
@@ -45,7 +44,7 @@ public class PostListAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater)context.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.list_group, parent, false);
+            convertView = inflater.inflate(R.layout.list_item_post, parent, false);
         }
         Post post = postList.get(groupPosition);
         TextView postUserName = (TextView) convertView.findViewById(R.id.text_post_name);
