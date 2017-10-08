@@ -1,6 +1,7 @@
 package com.lab.dbis.socnet;
 
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -28,6 +29,14 @@ public class NewPostFragment extends Fragment {
         // Required empty public constructor
     }
 
+    public void toast(final String msg, final int duration){
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(getActivity(), msg, duration).show();
+
+            }
+        });
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,20 +78,30 @@ public class NewPostFragment extends Fragment {
             requestHandler.setSessionID(SessionID);
             JSONObject response = requestHandler.handle(getString(R.string.base_url)+"CreatePost", "POST", paramsMap);
             try {
-                return response.getBoolean("status");
+                if (response.getBoolean("status"))
+                    return true;
+                else {
+                    NewPostFragment.this.toast("Not connected to internet", Toast.LENGTH_SHORT);
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    getActivity().startActivity(intent);
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
+                NewPostFragment.this.toast("Server error", Toast.LENGTH_SHORT);
             } catch (NullPointerException e){
                 e.printStackTrace();
+                NewPostFragment.this.toast("Not connected to internet", Toast.LENGTH_SHORT);
             }
             return false;
         }
 
         @Override
         protected  void onPostExecute(final Boolean success) {
-            if (success)
-                Log.i("AddPost","Posted");
-            //Toast.makeText(getApplicationContext(),"You are not connected to the internet",Toast.LENGTH_SHORT).show();
+            if (success) {
+                NewPostFragment.this.toast("Added post successfully", Toast.LENGTH_SHORT);
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                getActivity().startActivity(intent);
+            }
         }
 
         @Override

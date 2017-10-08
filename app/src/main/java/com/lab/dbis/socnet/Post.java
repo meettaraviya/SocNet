@@ -1,5 +1,9 @@
 package com.lab.dbis.socnet;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 /**
@@ -15,12 +19,14 @@ public class Post {
     public Post() {
 
     }
-    public Post(String id, String name, String timestamp, String content, List<Comment> commentList) {
-        this.id = id;
-        this.name = name;
-        this.timestamp = timestamp;
-        this.content = content;
-        this.commentList = commentList;
+    public Post(JSONObject postObj) throws JSONException {
+        id = postObj.getString("uid");
+        name = postObj.getString("name");
+        timestamp = postObj.getString("timestamp");
+        content = postObj.getString("text");
+        JSONArray jsonCommentArray = postObj.getJSONArray("Comment");
+        for(int i=0; i<jsonCommentArray.length();i++)
+            commentList.add(new Comment(jsonCommentArray.getJSONObject(i)));
     }
     public int commentListSize() {
         return commentList.size();

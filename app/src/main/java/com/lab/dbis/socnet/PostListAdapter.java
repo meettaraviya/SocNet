@@ -84,7 +84,10 @@ public class PostListAdapter extends BaseExpandableListAdapter {
     }
     @Override
     public int getGroupCount() {
-        return postList.size();
+        if(postList!=null)
+            return postList.size();
+        else
+            return 0;
     }
     @Override
     public int getChildrenCount(int groupPosition) {

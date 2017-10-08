@@ -1,5 +1,9 @@
 package com.lab.dbis.socnet;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by harshdepal on 8/10/17.
  */
@@ -12,11 +16,11 @@ public class Comment {
     public Comment() {
 
     }
-    public Comment(String id, String name, String timestamp, String content) {
-        this.id = id;
-        this.name = name;
-        this.content = content;
-        this.timestamp = timestamp;
+    public Comment(JSONObject postObj) throws JSONException {
+        id = postObj.getString("uid");
+        name = postObj.getString("name");
+        timestamp = postObj.getString("timestamp");
+        content = postObj.getString("text");
     }
     public String getName() {
         return name;

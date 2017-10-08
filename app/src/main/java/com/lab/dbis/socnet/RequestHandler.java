@@ -123,6 +123,9 @@ public class RequestHandler {
             }
 
             response = new JSONObject(total.toString());
+            Log.i("Request", "Location = "+ location);
+            Log.i("Request", "Method = "+ method);
+            Log.i("Request", "Params = "+ params);
             Log.i("Response", response.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();

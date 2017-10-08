@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity
         SessionID = getIntent().getStringExtra("SessionID");
         bundle = new Bundle();
         bundle.putString("SessionID",SessionID);
-
+        bundle.putString("location", "SeePosts");
         ViewPostFragment newFragment = new ViewPostFragment();
         newFragment.setArguments(bundle);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

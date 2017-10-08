@@ -247,6 +247,7 @@ public class SearchFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
+            searchUserTask = null;
         }
 
         @Override
