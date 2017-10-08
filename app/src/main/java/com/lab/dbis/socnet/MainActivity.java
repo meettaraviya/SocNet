@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity
         bundle = new Bundle();
         bundle.putString("SessionID",SessionID);
 
-        NewPostFragment newFragment = new NewPostFragment();
+        ViewPostFragment newFragment = new ViewPostFragment();
         newFragment.setArguments(bundle);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_placeholder, newFragment);
