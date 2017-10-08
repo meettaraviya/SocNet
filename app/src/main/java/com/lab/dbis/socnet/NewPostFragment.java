@@ -67,7 +67,7 @@ public class NewPostFragment extends Fragment {
             paramsMap.put("content",content);
             RequestHandler requestHandler = new RequestHandler();
             requestHandler.setSessionID(SessionID);
-            JSONObject response = requestHandler.handle(getString(R.string.URL_ADD_POST), "POST", paramsMap);
+            JSONObject response = requestHandler.handle(getString(R.string.base_url)+"CreatePost", "POST", paramsMap);
             try {
                 return response.getBoolean("status");
             } catch (JSONException e) {

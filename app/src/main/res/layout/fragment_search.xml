@@ -21,14 +21,13 @@
             android:layout_weight="0.1">
 
             <MultiAutoCompleteTextView
-                android:id="@+id/multiAutoCompleteTextView3"
+                android:id="@+id/text_search"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="MultiAutoCompleteTextView"
                 android:layout_weight="0.85"/>
 
             <ImageButton
-                android:id="@+id/imageButton"
+                android:id="@+id/button_search"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.15"

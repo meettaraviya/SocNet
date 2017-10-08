@@ -308,12 +308,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
-        private String sessionID;
+        private String SessionID;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
-            sessionID = null;
+            SessionID = null;
         }
 
         @Override
@@ -325,7 +325,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             RequestHandler requestHandler = new RequestHandler();
             requestHandler.doStoreCookie(true);
             JSONObject response = requestHandler.handle(getString(R.string.base_url)+"Login","POST", paramsMap);
-            sessionID = requestHandler.getCookie("JSESSIONID");
+            SessionID = requestHandler.getCookie("JSESSIONID");
             try {
                 return response.getBoolean("status");
             } catch (JSONException e) {
@@ -345,8 +345,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             if (success) {
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.putExtra("sessionID", sessionID);
-                Log.i("JSESSIONID", sessionID);
+                intent.putExtra("SessionID", SessionID);
+                Log.i("JSESSIONID", SessionID);
                 startActivity(intent);
             } else {
                 LoginActivity.this.toast("Incorrect credentials", Toast.LENGTH_SHORT);

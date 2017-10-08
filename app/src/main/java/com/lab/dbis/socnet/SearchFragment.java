@@ -1,9 +1,12 @@
 package com.lab.dbis.socnet;
 
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -59,12 +62,12 @@ public class SearchFragment extends Fragment {
 
         searchTextBox = (AutoCompleteTextView) view.findViewById(R.id.text_search);
         final ImageButton searchButton = (ImageButton) view.findViewById(R.id.button_search);
-        followButton = (Button) view.findViewById(R.id.button_follow);
-        viewPostButton = (Button) view.findViewById(R.id.button_viewpost_search);
-        cancelButton = (Button) view.findViewById(R.id.button_cancel_search);
-        followButton.setVisibility(View.GONE);
-        viewPostButton.setVisibility(View.GONE);
-        cancelButton.setVisibility(View.GONE);
+//        followButton = (Button) view.findViewById(R.id.button_follow);
+//        viewPostButton = (Button) view.findViewById(R.id.button_viewpost_search);
+//        cancelButton = (Button) view.findViewById(R.id.button_cancel_search);
+//        followButton.setVisibility(View.GONE);
+//        viewPostButton.setVisibility(View.GONE);
+//        cancelButton.setVisibility(View.GONE);
         searchTextBox.setThreshold(3);
 
 
@@ -88,9 +91,9 @@ public class SearchFragment extends Fragment {
                     searchUserTask.cancel(true);
                 searchUserTask = new SearchUserTask(SessionID, input);
                 searchUserTask.execute((Void) null);
-                followButton.setVisibility(View.GONE);
-                viewPostButton.setVisibility(View.GONE);
-                cancelButton.setVisibility(View.GONE);
+//                followButton.setVisibility(View.GONE);
+//                viewPostButton.setVisibility(View.GONE);
+//                cancelButton.setVisibility(View.GONE);
                 Log.i("Text Change",input);
             }
         });
@@ -101,9 +104,44 @@ public class SearchFragment extends Fragment {
                 String input = searchTextBox.getText().toString();
                 if (uidSet.contains(input)) {
                     uid = input;
-                    followButton.setVisibility(View.VISIBLE);
-                    viewPostButton.setVisibility(View.VISIBLE);
-                    cancelButton.setVisibility(View.VISIBLE);
+//                    followButton.setVisibility(View.VISIBLE);
+//                    viewPostButton.setVisibility(View.VISIBLE);
+//                    cancelButton.setVisibility(View.VISIBLE);
+
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("Test");
+//                    builder.setIcon(R.drawable.icon);
+                    builder.setMessage("test");
+                    builder.setPositiveButton("Follow",
+                            new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int id)
+                                {
+                                    followUserTask.execute((Void) null);
+                                    dialog.cancel();
+                                }
+                            });
+
+                    builder.setNeutralButton("Show Posts",
+                            new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int id)
+                                {
+
+                                    dialog.cancel();
+                                }
+                            });
+
+                    builder.setNegativeButton("Cancel",
+                            new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int id)
+                                {
+                                    dialog.cancel();
+                                }
+                            });
+
                     searchTextBox.dismissDropDown();
 
                 }
@@ -136,7 +174,7 @@ public class SearchFragment extends Fragment {
             paramsMap.put("uid",uid);
             RequestHandler requestHandler = new RequestHandler();
             requestHandler.setSessionID(SessionID);
-            JSONObject response = requestHandler.handle(getString(R.string.URL_FOLLOW_USER), "POST", paramsMap);
+            JSONObject response = requestHandler.handle(getString(R.string.base_url)+"Follow", "POST", paramsMap);
             try {
                 return response.getBoolean("status");
             } catch (JSONException e) {
@@ -177,7 +215,7 @@ public class SearchFragment extends Fragment {
             paramsMap.put("uid",input);
             RequestHandler requestHandler = new RequestHandler();
             requestHandler.setSessionID(SessionID);
-            response = requestHandler.handle(getString(R.string.URL_SEARCH_USER), "POST", paramsMap);
+            response = requestHandler.handle(getString(R.string.base_url)+"SearchUser", "POST", paramsMap);
             try {
                 return response.getBoolean("status");
             } catch (JSONException e) {
@@ -214,6 +252,7 @@ public class SearchFragment extends Fragment {
         @Override
         protected void onCancelled() {
             searchUserTask = null;
+            super.onCancelled();
         }
 
     }
