@@ -18,14 +18,14 @@
             android:layout_height="49dp"
             android:orientation="horizontal">
 
-            <MultiAutoCompleteTextView
-                android:id="@+id/multiAutoCompleteTextView3"
+            <AutoCompleteTextView
+                android:id="@+id/text_search"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1" />
 
             <ImageButton
-                android:id="@+id/imageButton"
+                android:id="@+id/button_search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:srcCompat="@android:drawable/ic_search_category_default" />

@@ -30,4 +30,8 @@
 
     <!--Strings related to NewPostFragment -->
     <string name="URL_ADD_POST">http://192.168.0.8:8080/SocNet/CreatePost</string>
+
+    <!--Strings related to SearchFragment -->
+    <string name="URL_SEARCH_USER">http://192.168.0.8:8080/SocNet/SearchUser</string>
+
 </resources>

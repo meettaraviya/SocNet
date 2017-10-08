@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        NewPostFragment newFragment = new NewPostFragment();
 
 //        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 //        transaction.replace(R.id.fragment_placeholder, newFragment);
@@ -55,6 +54,14 @@ public class MainActivity extends AppCompatActivity
         SessionID = getIntent().getStringExtra("SessionID");
         bundle = new Bundle();
         bundle.putString("SessionID",SessionID);
+
+        NewPostFragment newFragment = new NewPostFragment();
+        newFragment.setArguments(bundle);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_placeholder, newFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
 
     }
 
