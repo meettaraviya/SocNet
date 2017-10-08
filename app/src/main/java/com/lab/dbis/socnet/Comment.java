@@ -5,15 +5,13 @@ package com.lab.dbis.socnet;
  */
 
 public class Comment {
-    private String id;
     private String name;
     private String content;
     private String timestamp;
     public Comment() {
 
     }
-    public Comment(String id, String name, String timestamp, String content) {
-        this.id = id;
+    public Comment(String name, String timestamp, String content) {
         this.name = name;
         this.content = content;
         this.timestamp = timestamp;
