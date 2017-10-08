@@ -28,9 +28,11 @@ import java.util.List;
 public class PostListAdapter extends BaseExpandableListAdapter {
     private List<Post> postList;
     private Context context;
-    public PostListAdapter(List<Post> postList, Context context) {
+    private String SessionID;
+    public PostListAdapter(List<Post> postList, Context context, String SessionID) {
         this.postList = postList;
         this.context = context;
+        this.SessionID = SessionID;
     }
     @Override
     public View getChildView(int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
@@ -54,7 +56,7 @@ public class PostListAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater)context.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.list_group, parent, false);
+            convertView = inflater.inflate(R.layout.list_item_post, parent, false);
         }
         Post post = postList.get(groupPosition);
         TextView postUserName = (TextView) convertView.findViewById(R.id.text_post_name);
@@ -143,6 +145,7 @@ public class PostListAdapter extends BaseExpandableListAdapter {
         protected Boolean doInBackground(Void... params) {
             HashMap<String, String> paramsMap = new HashMap<>();
             paramsMap.put("postid",postid);
+            System.out.println("POSTID = " + postid);
             paramsMap.put("content",content);
             RequestHandler requestHandler = new RequestHandler();
             requestHandler.setSessionID(SessionID);
@@ -160,7 +163,7 @@ public class PostListAdapter extends BaseExpandableListAdapter {
         @Override
         protected  void onPostExecute(final Boolean success) {
             if (success) {
-
+                
             }
         }
 

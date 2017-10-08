@@ -25,7 +25,7 @@ public class Post {
 
     }
     public Post(JSONObject postObj) throws JSONException {
-        id = postObj.getString("uid");
+        id = postObj.getString("postid");
         name = postObj.getString("name");
 
         try {

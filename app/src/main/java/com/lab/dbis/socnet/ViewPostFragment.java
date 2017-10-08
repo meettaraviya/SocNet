@@ -64,7 +64,7 @@ public class ViewPostFragment extends Fragment {
         viewPostTask = new ViewPostTask();
         viewPostTask.execute();
 
-        PostListAdapter postListAdapter = new PostListAdapter(postList,getContext());
+        PostListAdapter postListAdapter = new PostListAdapter(postList,getContext(), SessionID);
         postListView.setAdapter(postListAdapter);
         postListView.setGroupIndicator(null);
 
