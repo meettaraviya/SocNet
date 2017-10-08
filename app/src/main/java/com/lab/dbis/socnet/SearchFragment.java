@@ -22,7 +22,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.StringTokenizer;
 
 
 /**
@@ -31,9 +33,14 @@ import java.util.List;
 public class SearchFragment extends Fragment {
 
     private AutoCompleteTextView searchTextBox;
+    private Button followButton;
+    private Button viewPostButton;
+    private Button cancelButton;
     private SearchUserTask searchUserTask;
+    private FollowUserTask followUserTask;
     private String SessionID;
-    private HashMap<String, String> uidMap;
+    private String uid;
+    private HashSet<String> uidSet;
     public SearchFragment() {
         // Required empty public constructor
     }
@@ -46,13 +53,20 @@ public class SearchFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         SessionID = getArguments().getString("SessionID");
-
+        uidSet = new HashSet<>();
+        uid = null;
         searchUserTask = null;
 
         searchTextBox = (AutoCompleteTextView) view.findViewById(R.id.text_search);
+        final ImageButton searchButton = (ImageButton) view.findViewById(R.id.button_search);
+        followButton = (Button) view.findViewById(R.id.button_follow);
+        viewPostButton = (Button) view.findViewById(R.id.button_viewpost_search);
+        cancelButton = (Button) view.findViewById(R.id.button_cancel_search);
+        followButton.setVisibility(View.GONE);
+        viewPostButton.setVisibility(View.GONE);
+        cancelButton.setVisibility(View.GONE);
         searchTextBox.setThreshold(3);
 
-        final ImageButton searchButton = (ImageButton) view.findViewById(R.id.button_search);
 
         searchTextBox.addTextChangedListener(new TextWatcher() {
             @Override
@@ -74,6 +88,9 @@ public class SearchFragment extends Fragment {
                     searchUserTask.cancel(true);
                 searchUserTask = new SearchUserTask(SessionID, input);
                 searchUserTask.execute((Void) null);
+                followButton.setVisibility(View.GONE);
+                viewPostButton.setVisibility(View.GONE);
+                cancelButton.setVisibility(View.GONE);
                 Log.i("Text Change",input);
             }
         });
@@ -81,7 +98,15 @@ public class SearchFragment extends Fragment {
         searchButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+                String input = searchTextBox.getText().toString();
+                if (uidSet.contains(input)) {
+                    uid = input;
+                    followButton.setVisibility(View.VISIBLE);
+                    viewPostButton.setVisibility(View.VISIBLE);
+                    cancelButton.setVisibility(View.VISIBLE);
+                    searchTextBox.dismissDropDown();
 
+                }
             }
         });
 
@@ -96,7 +121,46 @@ public class SearchFragment extends Fragment {
         Log.i("setAdapter","true");
     }
 
+    private class FollowUserTask extends AsyncTask<Void, Void, Boolean> {
+        private final String SessionID;
+        private final String uid;
 
+        FollowUserTask(String SessionID, String uid){
+            this.SessionID = SessionID;
+            this.uid = uid;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            HashMap<String, String> paramsMap = new HashMap<>();
+            paramsMap.put("uid",uid);
+            RequestHandler requestHandler = new RequestHandler();
+            requestHandler.setSessionID(SessionID);
+            JSONObject response = requestHandler.handle(getString(R.string.URL_FOLLOW_USER), "POST", paramsMap);
+            try {
+                return response.getBoolean("status");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (NullPointerException e){
+                e.printStackTrace();
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if (success) {
+                Log.i("FollowTask","done");
+            }
+            else
+                Log.i("FollowTask","not done");
+        }
+
+        @Override
+        protected void onCancelled() {
+
+        }
+    }
     private class SearchUserTask extends AsyncTask<Void, Void, Boolean> {
         private final String SessionID;
         private final String input;
@@ -128,7 +192,7 @@ public class SearchFragment extends Fragment {
         protected  void onPostExecute(final Boolean success) {
             if (success) {
                 try {
-                    uidMap = new HashMap<>();
+                    uidSet = new HashSet<>();
                     List<String> adapterList = new ArrayList<>();
                     JSONArray users = response.getJSONArray("data").getJSONArray(0);
                     for (int i = 0; i < users.length(); i++) {
@@ -137,9 +201,7 @@ public class SearchFragment extends Fragment {
                         String name = user.getString("name");
                         String email = user.getString("email");
                         adapterList.add(new String(id));
-                        uidMap.put(id,id);
-                        uidMap.put(name,id);
-                        uidMap.put(email,id);
+                        uidSet.add(new String(id));
                     }
                     setAdapter(adapterList);
                 }
