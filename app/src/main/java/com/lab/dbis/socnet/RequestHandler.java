@@ -31,9 +31,13 @@ import javax.net.ssl.HttpsURLConnection;
 public class RequestHandler {
 
     private boolean storeCookie;
+    private boolean sendSessionID;
     private HashMap<String, String> cookieMap;
+    String SessionID;
     public RequestHandler(){
         storeCookie = false;
+        sendSessionID = false;
+        SessionID = null;
         cookieMap = null;
     }
     private String getQuery(HashMap<String,String> params) throws UnsupportedEncodingException {
@@ -53,6 +57,10 @@ public class RequestHandler {
         }
 
         return result.toString();
+    }
+    public void setSessionID(String SessionID) {
+        sendSessionID = true;
+        this.SessionID = SessionID;
     }
     public void doStoreCookie(boolean storeCookie) {
         this.storeCookie = storeCookie;
@@ -89,7 +97,10 @@ public class RequestHandler {
             conn.setConnectTimeout(10000);
             conn.setRequestMethod(method);
             conn.setDoInput(true);
-
+            if (sendSessionID) {
+                Log.i("session-id",SessionID);
+                conn.setRequestProperty("Cookie", "JSESSIONID="+SessionID);
+            }
             if(method.equals("POST") && params!=null){
                 conn.setDoOutput(true);
                 OutputStream os = conn.getOutputStream();
