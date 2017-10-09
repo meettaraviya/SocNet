@@ -20,7 +20,7 @@
             android:layout_gravity="bottom"
             android:layout_weight="0.1">
 
-            <MultiAutoCompleteTextView
+            <AutoCompleteTextView
                 android:id="@+id/text_search"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"

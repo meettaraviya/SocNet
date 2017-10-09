@@ -59,7 +59,6 @@ public class SearchFragment extends Fragment {
         uidSet = new HashSet<>();
         uid = null;
         searchUserTask = null;
-
         searchTextBox = (AutoCompleteTextView) view.findViewById(R.id.text_search);
         final ImageButton searchButton = (ImageButton) view.findViewById(R.id.button_search);
 //        followButton = (Button) view.findViewById(R.id.button_follow);
@@ -69,8 +68,6 @@ public class SearchFragment extends Fragment {
 //        viewPostButton.setVisibility(View.GONE);
 //        cancelButton.setVisibility(View.GONE);
         searchTextBox.setThreshold(3);
-
-
         searchTextBox.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -118,6 +115,7 @@ public class SearchFragment extends Fragment {
                             {
                                 public void onClick(DialogInterface dialog, int id)
                                 {
+                                    followUserTask = new FollowUserTask(SessionID, uid);
                                     followUserTask.execute((Void) null);
                                     dialog.cancel();
                                 }
@@ -152,11 +150,7 @@ public class SearchFragment extends Fragment {
     }
 
     private void setAdapter(List<String> userList) {
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-                android.R.layout.simple_dropdown_item_1line, userList);
-        searchTextBox.setAdapter(adapter);
-        searchTextBox.showDropDown();
-        Log.i("setAdapter","true");
+
     }
 
     private class FollowUserTask extends AsyncTask<Void, Void, Boolean> {
@@ -229,23 +223,30 @@ public class SearchFragment extends Fragment {
         @Override
         protected  void onPostExecute(final Boolean success) {
             if (success) {
-                try {
-                    uidSet = new HashSet<>();
-                    List<String> adapterList = new ArrayList<>();
-                    JSONArray users = response.getJSONArray("data").getJSONArray(0);
-                    for (int i = 0; i < users.length(); i++) {
-                        JSONObject user = users.getJSONObject(i);
-                        String id = user.getString("uid");
-                        String name = user.getString("name");
-                        String email = user.getString("email");
-                        adapterList.add(new String(id));
-                        uidSet.add(new String(id));
+                getActivity().runOnUiThread(new Runnable(){
+                    @Override
+                    public void run() {
+                        uidSet = new HashSet<>();
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+                                android.R.layout.simple_dropdown_item_1line);
+                        try {
+                            JSONArray users = response.getJSONArray("data").getJSONArray(0);
+                            for (int i = 0; i < users.length(); i++) {
+                                JSONObject user = users.getJSONObject(i);
+                                String id = user.getString("uid");
+                                String name = user.getString("name");
+                                String email = user.getString("email");
+                                adapter.add(id);
+                                uidSet.add(id);
+                            }
+                            searchTextBox.setAdapter(adapter);
+                            searchTextBox.showDropDown();
+                            Log.i("setAdapter", adapter.toString());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-                    setAdapter(adapterList);
-                }
-                catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                });
             }
             searchUserTask = null;
         }
