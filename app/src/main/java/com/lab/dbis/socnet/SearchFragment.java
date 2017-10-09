@@ -41,10 +41,11 @@ public class SearchFragment extends Fragment {
     private Button viewPostButton;
     private Button cancelButton;
     private SearchUserTask searchUserTask;
+    private ArrayAdapter<String> adapter;
     private FollowUserTask followUserTask;
     private String SessionID;
     private String uid;
-    private HashSet<String> uidSet;
+    private HashMap<String, String> uidMap;
     public SearchFragment() {
         // Required empty public constructor
     }
@@ -57,9 +58,11 @@ public class SearchFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         SessionID = getArguments().getString("SessionID");
-        uidSet = new HashSet<>();
+        uidMap = new HashMap<>();
         uid = null;
         searchUserTask = null;
+        adapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_dropdown_item_1line);
         searchTextBox = (AutoCompleteTextView) view.findViewById(R.id.text_search);
         final ImageButton searchButton = (ImageButton) view.findViewById(R.id.button_search);
 //        followButton = (Button) view.findViewById(R.id.button_follow);
@@ -69,6 +72,7 @@ public class SearchFragment extends Fragment {
 //        viewPostButton.setVisibility(View.GONE);
 //        cancelButton.setVisibility(View.GONE);
         searchTextBox.setThreshold(3);
+        searchTextBox.setAdapter(adapter);
         searchTextBox.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -100,8 +104,9 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String input = searchTextBox.getText().toString();
-                if (uidSet.contains(input)) {
-                    uid = input;
+                uid = uidMap.get(input);
+                if (uid != null) {
+
 //                    followButton.setVisibility(View.VISIBLE);
 //                    viewPostButton.setVisibility(View.VISIBLE);
 //                    cancelButton.setVisibility(View.VISIBLE);
@@ -236,9 +241,8 @@ public class SearchFragment extends Fragment {
                 getActivity().runOnUiThread(new Runnable(){
                     @Override
                     public void run() {
-                        uidSet = new HashSet<>();
-                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-                                android.R.layout.simple_dropdown_item_1line);
+                        uidMap = new HashMap<String, String>();
+                        adapter.clear();
                         try {
                             JSONArray users = response.getJSONArray("data").getJSONArray(0);
                             for (int i = 0; i < users.length(); i++) {
@@ -247,11 +251,14 @@ public class SearchFragment extends Fragment {
                                 String name = user.getString("name");
                                 String email = user.getString("email");
                                 adapter.add(id);
-                                uidSet.add(id);
+                                adapter.add(name);
+                                adapter.add(email);
+                                uidMap.put(id,id);
+                                uidMap.put(name,id);
+                                uidMap.put(email,id);
                             }
-                            searchTextBox.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
                             searchTextBox.showDropDown();
-                            Log.i("setAdapter", adapter.toString());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
