@@ -1,6 +1,9 @@
 package com.lab.dbis.socnet;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.format.DateUtils;
+import android.util.Base64;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,6 +12,7 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 /**
@@ -20,6 +24,7 @@ public class Post {
     private String name;
     private String timestamp;
     private String content;
+    private String image;
     private List<Comment> commentList;
     public Post() {
 
@@ -27,6 +32,8 @@ public class Post {
     public Post(JSONObject postObj) throws JSONException {
         id = postObj.getString("postid");
         name = postObj.getString("name");
+        if(postObj.has("image"))
+            image = postObj.getString("image");
 
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
@@ -62,5 +69,12 @@ public class Post {
     public String getId() {
         return id;
     }
-
+    public Bitmap getImage() {
+        if(image!=null) {
+            byte[] decodedString = Base64.decode(image, Base64.DEFAULT);
+            return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        }
+        else
+            return null;
+    }
 }

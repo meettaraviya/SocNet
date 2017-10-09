@@ -11,6 +11,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -62,6 +63,8 @@ public class PostListAdapter extends BaseExpandableListAdapter {
         TextView postUserName = (TextView) convertView.findViewById(R.id.text_post_name);
         TextView postTimestamp = (TextView) convertView.findViewById(R.id.text_post_timestamp);
         TextView postContent = (TextView) convertView.findViewById(R.id.text_post_content);
+        ImageView postImage = (ImageView) convertView.findViewById(R.id.image_post);
+
         final EditText editTextComment = (EditText) convertView.findViewById(R.id.edittext_post_new_comment);
         Button buttonViewComments = (Button) convertView.findViewById(R.id.button_post_view_comments);
         Button buttonAddComment = (Button) convertView.findViewById(R.id.button_post_add_comment);
@@ -69,6 +72,13 @@ public class PostListAdapter extends BaseExpandableListAdapter {
         postUserName.setText(post.getName());
         postTimestamp.setText(post.getTimestamp());
         postContent.setText(post.getContent());
+        if(post.getImage()!=null){
+            postImage.setImageBitmap(post.getImage());
+            postImage.setVisibility(View.VISIBLE);
+        }
+        else{
+            postImage.setVisibility(View.GONE);
+        }
         buttonViewComments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,7 +100,6 @@ public class PostListAdapter extends BaseExpandableListAdapter {
                 addCommentTask.execute((Void) null);
             }
         });
-
 
         return convertView;
     }

@@ -43,6 +43,12 @@
         android:layout_marginTop="4dp"
         android:textSize="16dp"/>
 
+    <ImageView
+        android:id="@+id/image_post"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
     <EditText
         android:id="@+id/edittext_post_new_comment"
         android:layout_width="match_parent"
