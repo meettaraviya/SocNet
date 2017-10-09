@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -105,12 +106,13 @@ public class SearchFragment extends Fragment {
 //                    viewPostButton.setVisibility(View.VISIBLE);
 //                    cancelButton.setVisibility(View.VISIBLE);
 
+                    searchTextBox.dismissDropDown();
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(),android.R.style.Theme_Material_Dialog_Alert);
                     builder.setTitle("Test");
 //                    builder.setIcon(R.drawable.icon);
                     builder.setMessage("test");
-                    builder.setPositiveButton("Follow",
+                    builder.setNeutralButton("Follow",
                             new DialogInterface.OnClickListener()
                             {
                                 public void onClick(DialogInterface dialog, int id)
@@ -121,26 +123,34 @@ public class SearchFragment extends Fragment {
                                 }
                             });
 
-                    builder.setNeutralButton("Show Posts",
-                            new DialogInterface.OnClickListener()
-                            {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-
-                                    dialog.cancel();
-                                }
-                            });
-
-                    builder.setNegativeButton("Cancel",
+                    builder.setNegativeButton("Show Posts",
                             new DialogInterface.OnClickListener()
                             {
                                 public void onClick(DialogInterface dialog, int id)
                                 {
                                     dialog.cancel();
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("SessionID",SessionID);
+                                    bundle.putString("location", "SeeUserPosts");
+                                    bundle.putString("uid",uid);
+                                    ViewPostFragment newFragment = new ViewPostFragment();
+                                    newFragment.setArguments(bundle);
+                                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                    transaction.replace(R.id.fragment_placeholder, newFragment);
+                                    transaction.addToBackStack(null);
+                                    transaction.commit();
                                 }
                             });
 
-                    searchTextBox.dismissDropDown();
+                    builder.setPositiveButton("Cancel",
+                            new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int id)
+                                {
+                                    dialog.cancel();
+                                }
+                            });
+                    builder.show();
 
                 }
             }
