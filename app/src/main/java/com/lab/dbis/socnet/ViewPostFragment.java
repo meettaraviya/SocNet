@@ -28,6 +28,7 @@ public class ViewPostFragment extends Fragment {
 
     private List<Post> postList;
     private ViewPostTask viewPostTask;
+    private PostListAdapter postListAdapter;
     private String location;
     private String uid;
     private String SessionID;
@@ -59,14 +60,13 @@ public class ViewPostFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_view_post, container, false);
         ExpandableListView postListView = (ExpandableListView) view.findViewById(R.id.expandable_post_list);
         postList = new ArrayList<Post>();
+        postListAdapter = new PostListAdapter(postList,getContext(), SessionID);
+        postListView.setAdapter(postListAdapter);
+        postListView.setGroupIndicator(null);
         if(viewPostTask!=null)
             viewPostTask.cancel(true);
         viewPostTask = new ViewPostTask();
-        viewPostTask.execute();
-
-        PostListAdapter postListAdapter = new PostListAdapter(postList,getContext(), SessionID);
-        postListView.setAdapter(postListAdapter);
-        postListView.setGroupIndicator(null);
+        viewPostTask.execute((Void) null);
 
         return view;
     }
@@ -109,6 +109,7 @@ public class ViewPostFragment extends Fragment {
 
         @Override
         protected void onPostExecute(final Boolean success) {
+            postListAdapter.notifyDataSetChanged();
             viewPostTask = null;
         }
 

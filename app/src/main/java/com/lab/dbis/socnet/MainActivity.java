@@ -107,6 +107,13 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.menu_item_newsfeed) {
+            bundle.putString("location", "SeePosts");
+            ViewPostFragment newFragment = new ViewPostFragment();
+            newFragment.setArguments(bundle);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_placeholder, newFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
 
         } else if (id == R.id.menu_item_newpost) {
             NewPostFragment newFragment = new NewPostFragment();
