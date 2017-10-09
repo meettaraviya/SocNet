@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
@@ -32,7 +33,8 @@ public class ViewPostFragment extends Fragment {
     private String location;
     private String uid;
     private String SessionID;
-
+    int offset;
+    int limit;
     public void toast(final String msg, final int duration){
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
@@ -41,6 +43,11 @@ public class ViewPostFragment extends Fragment {
             }
         });
     }
+
+    public void updateOffset(int offset) {
+        this.offset = offset;
+    }
+
 
     public ViewPostFragment() {
         // Required empty public constructor
@@ -59,14 +66,29 @@ public class ViewPostFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_view_post, container, false);
         ExpandableListView postListView = (ExpandableListView) view.findViewById(R.id.expandable_post_list);
+        offset = 0;
+        limit = 10;
+        postListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+
+                if (i + i1 == i2) {
+                    if (viewPostTask != null)
+                        return;
+                    viewPostTask = new ViewPostTask(offset, limit);
+                    viewPostTask.execute((Void) null);
+                }
+            }
+        });
         postList = new ArrayList<Post>();
         postListAdapter = new PostListAdapter(postList,getContext(), SessionID);
         postListView.setAdapter(postListAdapter);
         postListView.setGroupIndicator(null);
-        if(viewPostTask!=null)
-            viewPostTask.cancel(true);
-        viewPostTask = new ViewPostTask();
-        viewPostTask.execute((Void) null);
 
         return view;
     }
@@ -75,7 +97,11 @@ public class ViewPostFragment extends Fragment {
 
     private class ViewPostTask extends AsyncTask<Void, Void, Boolean> {
 
-        ViewPostTask() {
+        private String offset;
+        private String limit;
+        ViewPostTask(int offset,int limit) {
+            this.offset = Integer.toString(offset);
+            this.limit = Integer.toString(limit);
         }
 
         @Override
@@ -84,6 +110,8 @@ public class ViewPostFragment extends Fragment {
             HashMap<String,String> paramsMap = new HashMap<>();
             if(uid !=null)
                 paramsMap.put("uid", uid);
+            paramsMap.put("offset",offset);
+            paramsMap.put("limit",limit);
             RequestHandler requestHandler = new RequestHandler();
             requestHandler.doStoreCookie(true);
             requestHandler.setSessionID(SessionID);
@@ -94,6 +122,9 @@ public class ViewPostFragment extends Fragment {
                 JSONArray jsonPostArray = response.getJSONArray("data");
                 for(int i=0; i<jsonPostArray.length(); i++)
                     postList.add(new Post(jsonPostArray.getJSONObject(i)));
+                int postCount = jsonPostArray.length(),previousOffset = Integer.parseInt(offset);
+                int newOffset = previousOffset + postCount;
+                updateOffset(newOffset);
                 return true;
 
             } catch (JSONException e) {
