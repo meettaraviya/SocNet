@@ -87,6 +87,10 @@ public class RequestHandler {
         return cookieValue;
     }
     public JSONObject handle(String location, String method, HashMap<String,String> params){
+        Log.i("Request", "Location = "+ location);
+        Log.i("Request", "Method = "+ method);
+        Log.i("Request", "Params = "+ params);
+
         URL url;
         HttpURLConnection conn = null;
         JSONObject response = null;
@@ -123,9 +127,6 @@ public class RequestHandler {
             }
 
             response = new JSONObject(total.toString());
-            Log.i("Request", "Location = "+ location);
-            Log.i("Request", "Method = "+ method);
-            Log.i("Request", "Params = "+ params);
             Log.i("Response", response.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();

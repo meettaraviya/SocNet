@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,9 +22,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 
 import static android.app.Activity.RESULT_OK;
@@ -36,6 +42,7 @@ public class NewPostFragment extends Fragment {
     private String SessionID;
     private static int GET_POST_IMAGE = 1;
     private View view;
+    private String image = null;
     public NewPostFragment() {
         // Required empty public constructor
     }
@@ -66,7 +73,7 @@ public class NewPostFragment extends Fragment {
                 String content = addPostEditText.getText().toString();
                 if (content.equals(""))
                     return;
-                AddPostTask addPostTask = new AddPostTask(SessionID,content);
+                AddPostTask addPostTask = new AddPostTask(SessionID,content, image);
                 addPostTask.execute((Void) null);
             }
         });
@@ -119,6 +126,24 @@ public class NewPostFragment extends Fragment {
             imageView.setVisibility(View.VISIBLE);
             imageView.setImageURI(selectedImage);
 
+            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();;
+
+            try {
+                InputStream iStream =   getActivity().getContentResolver().openInputStream(selectedImage);
+
+
+                int bufferSize = 1024;
+                byte[] buffer = new byte[bufferSize];
+
+                int len = 0;
+                while ((len = iStream.read(buffer)) != -1) {
+                    byteBuffer.write(buffer, 0, len);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            image = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
+
         }
 
 
@@ -127,16 +152,20 @@ public class NewPostFragment extends Fragment {
     private class AddPostTask extends AsyncTask<Void, Void, Boolean> {
         private final String SessionID;
         private final String content;
+        private final String image;
 
-        AddPostTask(String SessionID, String content) {
+        AddPostTask(String SessionID, String content, String image) {
             this.SessionID = SessionID;
             this.content = content;
+            this.image = image;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             HashMap<String, String> paramsMap = new HashMap<>();
             paramsMap.put("content",content);
+            if(image!=null)
+                paramsMap.put("image", image);
             RequestHandler requestHandler = new RequestHandler();
             requestHandler.setSessionID(SessionID);
             JSONObject response = requestHandler.handle(getString(R.string.base_url)+"CreatePost", "POST", paramsMap);
@@ -162,13 +191,20 @@ public class NewPostFragment extends Fragment {
         protected  void onPostExecute(final Boolean success) {
             if (success) {
                 NewPostFragment.this.toast("Added post successfully", Toast.LENGTH_SHORT);
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                getActivity().startActivity(intent);
+                Bundle bundle = new Bundle();
+                bundle.putString("location", "SeePosts");
+                bundle.putString("SessionID", SessionID);
+                ViewPostFragment newFragment = new ViewPostFragment();
+                newFragment.setArguments(bundle);
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_placeholder, newFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
             }
         }
 
         @Override
-        protected  void onCancelled() {
+        protected void onCancelled() {
 
         }
 
