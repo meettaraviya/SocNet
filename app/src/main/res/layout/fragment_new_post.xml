@@ -1,8 +1,12 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.lab.dbis.socnet.NewPostFragment">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,6 +21,13 @@
             android:hint="What's on your mind?"
             android:inputType="textMultiLine" />
 
+        <ImageView
+            android:id="@+id/image_new_post"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:srcCompat="@android:drawable/picture_frame"
+            android:visibility="gone"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,6 +41,13 @@
                 android:text="Post" />
 
             <Button
+                android:id="@+id/button_post_picture"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Picture"
+                android:layout_weight="0.5"/>
+
+            <Button
                 android:id="@+id/button_cancel_new_post"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -39,4 +57,5 @@
         </LinearLayout>
 
     </LinearLayout>
+    </ScrollView>
 </FrameLayout>

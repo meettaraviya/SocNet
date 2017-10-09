@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -40,10 +41,11 @@ public class SearchFragment extends Fragment {
     private Button viewPostButton;
     private Button cancelButton;
     private SearchUserTask searchUserTask;
+    private ArrayAdapter<String> adapter;
     private FollowUserTask followUserTask;
     private String SessionID;
     private String uid;
-    private HashSet<String> uidSet;
+    private HashMap<String, String> uidMap;
     public SearchFragment() {
         // Required empty public constructor
     }
@@ -56,10 +58,11 @@ public class SearchFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         SessionID = getArguments().getString("SessionID");
-        uidSet = new HashSet<>();
+        uidMap = new HashMap<>();
         uid = null;
         searchUserTask = null;
-
+        adapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_dropdown_item_1line);
         searchTextBox = (AutoCompleteTextView) view.findViewById(R.id.text_search);
         final ImageButton searchButton = (ImageButton) view.findViewById(R.id.button_search);
 //        followButton = (Button) view.findViewById(R.id.button_follow);
@@ -69,8 +72,7 @@ public class SearchFragment extends Fragment {
 //        viewPostButton.setVisibility(View.GONE);
 //        cancelButton.setVisibility(View.GONE);
         searchTextBox.setThreshold(3);
-
-
+        searchTextBox.setAdapter(adapter);
         searchTextBox.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -102,47 +104,58 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String input = searchTextBox.getText().toString();
-                if (uidSet.contains(input)) {
-                    uid = input;
+                uid = uidMap.get(input);
+                if (uid != null) {
+
 //                    followButton.setVisibility(View.VISIBLE);
 //                    viewPostButton.setVisibility(View.VISIBLE);
 //                    cancelButton.setVisibility(View.VISIBLE);
 
+                    searchTextBox.dismissDropDown();
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(),android.R.style.Theme_Material_Dialog_Alert);
                     builder.setTitle("Test");
 //                    builder.setIcon(R.drawable.icon);
                     builder.setMessage("test");
-                    builder.setPositiveButton("Follow",
+                    builder.setNeutralButton("Follow",
                             new DialogInterface.OnClickListener()
                             {
                                 public void onClick(DialogInterface dialog, int id)
                                 {
+                                    followUserTask = new FollowUserTask(SessionID, uid);
                                     followUserTask.execute((Void) null);
                                     dialog.cancel();
                                 }
                             });
 
-                    builder.setNeutralButton("Show Posts",
-                            new DialogInterface.OnClickListener()
-                            {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-
-                                    dialog.cancel();
-                                }
-                            });
-
-                    builder.setNegativeButton("Cancel",
+                    builder.setNegativeButton("Show Posts",
                             new DialogInterface.OnClickListener()
                             {
                                 public void onClick(DialogInterface dialog, int id)
                                 {
                                     dialog.cancel();
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("SessionID",SessionID);
+                                    bundle.putString("location", "SeeUserPosts");
+                                    bundle.putString("uid",uid);
+                                    ViewPostFragment newFragment = new ViewPostFragment();
+                                    newFragment.setArguments(bundle);
+                                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                    transaction.replace(R.id.fragment_placeholder, newFragment);
+                                    transaction.addToBackStack(null);
+                                    transaction.commit();
                                 }
                             });
 
-                    searchTextBox.dismissDropDown();
+                    builder.setPositiveButton("Cancel",
+                            new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int id)
+                                {
+                                    dialog.cancel();
+                                }
+                            });
+                    builder.show();
 
                 }
             }
@@ -152,11 +165,7 @@ public class SearchFragment extends Fragment {
     }
 
     private void setAdapter(List<String> userList) {
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-                android.R.layout.simple_dropdown_item_1line, userList);
-        searchTextBox.setAdapter(adapter);
-        searchTextBox.showDropDown();
-        Log.i("setAdapter","true");
+
     }
 
     private class FollowUserTask extends AsyncTask<Void, Void, Boolean> {
@@ -229,23 +238,32 @@ public class SearchFragment extends Fragment {
         @Override
         protected  void onPostExecute(final Boolean success) {
             if (success) {
-                try {
-                    uidSet = new HashSet<>();
-                    List<String> adapterList = new ArrayList<>();
-                    JSONArray users = response.getJSONArray("data").getJSONArray(0);
-                    for (int i = 0; i < users.length(); i++) {
-                        JSONObject user = users.getJSONObject(i);
-                        String id = user.getString("uid");
-                        String name = user.getString("name");
-                        String email = user.getString("email");
-                        adapterList.add(new String(id));
-                        uidSet.add(new String(id));
+                getActivity().runOnUiThread(new Runnable(){
+                    @Override
+                    public void run() {
+                        uidMap = new HashMap<String, String>();
+                        adapter.clear();
+                        try {
+                            JSONArray users = response.getJSONArray("data").getJSONArray(0);
+                            for (int i = 0; i < users.length(); i++) {
+                                JSONObject user = users.getJSONObject(i);
+                                String id = user.getString("uid");
+                                String name = user.getString("name");
+                                String email = user.getString("email");
+                                adapter.add(id);
+                                adapter.add(name);
+                                adapter.add(email);
+                                uidMap.put(id,id);
+                                uidMap.put(name,id);
+                                uidMap.put(email,id);
+                            }
+                            adapter.notifyDataSetChanged();
+                            searchTextBox.showDropDown();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-                    setAdapter(adapterList);
-                }
-                catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                });
             }
             searchUserTask = null;
         }
