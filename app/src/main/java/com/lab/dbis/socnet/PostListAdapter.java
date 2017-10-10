@@ -19,6 +19,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,12 +30,14 @@ import java.util.List;
 
 public class PostListAdapter extends BaseExpandableListAdapter {
     private List<Post> postList;
+    private List<Boolean> commentList;
     private Context context;
     private String SessionID;
-    public PostListAdapter(List<Post> postList, Context context, String SessionID) {
+    public PostListAdapter(List<Post> postList,List<Boolean> commentList, Context context, String SessionID) {
         this.postList = postList;
         this.context = context;
         this.SessionID = SessionID;
+        this.commentList = commentList;
     }
     @Override
     public View getChildView(int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
@@ -58,6 +62,7 @@ public class PostListAdapter extends BaseExpandableListAdapter {
             LayoutInflater inflater = (LayoutInflater)context.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.list_item_post, parent, false);
+            ((ExpandableListView) parent).expandGroup(groupPosition,false);
         }
         Post post = postList.get(groupPosition);
         TextView postUserName = (TextView) convertView.findViewById(R.id.text_post_name);
@@ -82,10 +87,9 @@ public class PostListAdapter extends BaseExpandableListAdapter {
         buttonViewComments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isExpanded)
-                    ((ExpandableListView) parent).collapseGroup(groupPosition);
-                else
-                    ((ExpandableListView) parent).expandGroup(groupPosition,false);
+                boolean currentState = commentList.get(groupPosition);
+                commentList.set(groupPosition,!currentState);
+                notifyDataSetChanged();
                 editTextComment.setText("");
             }
         });
@@ -124,7 +128,13 @@ public class PostListAdapter extends BaseExpandableListAdapter {
     }
     @Override
     public int getChildrenCount(int groupPosition) {
-        return postList.get(groupPosition).commentListSize();
+        int totalComments =  postList.get(groupPosition).commentListSize();
+        if (commentList.get(groupPosition) == false) {
+            return Math.min(totalComments,3);
+        }
+        else {
+            return totalComments;
+        }
     }
     @Override
     public long getGroupId(int groupPosition) {

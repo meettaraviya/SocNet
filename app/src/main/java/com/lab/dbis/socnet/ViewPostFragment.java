@@ -28,6 +28,7 @@ import java.util.List;
 public class ViewPostFragment extends Fragment {
 
     private List<Post> postList;
+    private List<Boolean> commentList;
     private ViewPostTask viewPostTask;
     private PostListAdapter postListAdapter;
     private String location;
@@ -86,7 +87,8 @@ public class ViewPostFragment extends Fragment {
             }
         });
         postList = new ArrayList<Post>();
-        postListAdapter = new PostListAdapter(postList,getContext(), SessionID);
+        commentList = new ArrayList<Boolean>();
+        postListAdapter = new PostListAdapter(postList,commentList,getContext(), SessionID);
         postListView.setAdapter(postListAdapter);
         postListView.setGroupIndicator(null);
 
@@ -120,8 +122,10 @@ public class ViewPostFragment extends Fragment {
             try {
 
                 JSONArray jsonPostArray = response.getJSONArray("data");
-                for(int i=0; i<jsonPostArray.length(); i++)
+                for(int i=0; i<jsonPostArray.length(); i++) {
                     postList.add(new Post(jsonPostArray.getJSONObject(i)));
+                    commentList.add(false);
+                }
                 int postCount = jsonPostArray.length(),previousOffset = Integer.parseInt(offset);
                 int newOffset = previousOffset + postCount;
                 updateOffset(newOffset);
