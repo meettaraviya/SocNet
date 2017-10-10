@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,11 +32,13 @@ public class ViewPostFragment extends Fragment {
     private List<Boolean> commentList;
     private ViewPostTask viewPostTask;
     private PostListAdapter postListAdapter;
+    private ExpandableListView postListView;
     private String location;
     private String uid;
     private String SessionID;
-    int offset;
-    int limit;
+    private int offset;
+    private int limit;
+    private boolean reachedTop;
     public void toast(final String msg, final int duration){
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
@@ -46,6 +49,10 @@ public class ViewPostFragment extends Fragment {
     }
 
     public void updateOffset(int offset) {
+        if (this.offset == 0 && offset > 0)
+            postListView.setSelectedGroup(offset-1);
+        if (this.offset == offset)
+            reachedTop = true;
         this.offset = offset;
     }
 
@@ -65,10 +72,12 @@ public class ViewPostFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_view_post, container, false);
-        ExpandableListView postListView = (ExpandableListView) view.findViewById(R.id.expandable_post_list);
         offset = 0;
         limit = 10;
+        reachedTop = false;
+        final View view = inflater.inflate(R.layout.fragment_view_post, container, false);
+        postListView = (ExpandableListView) view.findViewById(R.id.expandable_post_list);
+
         postListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int i) {
@@ -76,22 +85,25 @@ public class ViewPostFragment extends Fragment {
             }
 
             @Override
-            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItem) {
 
-                if (i + i1 == i2) {
-                    if (viewPostTask != null)
-                        return;
-                    viewPostTask = new ViewPostTask(offset, limit);
-                    viewPostTask.execute((Void) null);
+                if (firstVisibleItem == 0) {
+                    if (viewPostTask == null && !reachedTop) {
+                        viewPostTask = new ViewPostTask(offset,limit);
+                        viewPostTask.execute((Void) null);
+                    }
                 }
             }
         });
+
+
+
         postList = new ArrayList<Post>();
         commentList = new ArrayList<Boolean>();
         postListAdapter = new PostListAdapter(postList,commentList,getContext(), SessionID);
         postListView.setAdapter(postListAdapter);
         postListView.setGroupIndicator(null);
-
+        postListView.setStackFromBottom(true);
         return view;
     }
 
@@ -101,6 +113,7 @@ public class ViewPostFragment extends Fragment {
 
         private String offset;
         private String limit;
+        private int newOffset;
         ViewPostTask(int offset,int limit) {
             this.offset = Integer.toString(offset);
             this.limit = Integer.toString(limit);
@@ -126,9 +139,9 @@ public class ViewPostFragment extends Fragment {
                     postList.add(new Post(jsonPostArray.getJSONObject(i)));
                     commentList.add(false);
                 }
-                int postCount = jsonPostArray.length(),previousOffset = Integer.parseInt(offset);
-                int newOffset = previousOffset + postCount;
-                updateOffset(newOffset);
+                int postCount = jsonPostArray.length();
+                int previousOffset = Integer.parseInt(offset);
+                newOffset = previousOffset + postCount;
                 return true;
 
             } catch (JSONException e) {
@@ -144,7 +157,9 @@ public class ViewPostFragment extends Fragment {
 
         @Override
         protected void onPostExecute(final Boolean success) {
+
             postListAdapter.notifyDataSetChanged();
+            updateOffset(newOffset);
             viewPostTask = null;
         }
 
