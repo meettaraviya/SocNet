@@ -29,19 +29,21 @@ public class MainActivity extends AppCompatActivity
 
     private Bundle bundle;
     private String SessionID;
+    private Toolbar toolbar;
     private LogoutUserTask logoutUserTask;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Home");
         setSupportActionBar(toolbar);
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -100,6 +102,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if(id == R.id.menu_item_home){
+            toolbar.setTitle("Home");
             bundle.putString("location", "SeePosts");
             ViewPostFragment newFragment = new ViewPostFragment();
             newFragment.setArguments(bundle);
@@ -108,6 +111,7 @@ public class MainActivity extends AppCompatActivity
             transaction.addToBackStack(null);
             transaction.commit();
         } else if (id == R.id.menu_item_myposts) {
+            toolbar.setTitle("My Posts");
             bundle.putString("location", "SeeMyPosts");
             ViewPostFragment newFragment = new ViewPostFragment();
             newFragment.setArguments(bundle);
@@ -117,6 +121,7 @@ public class MainActivity extends AppCompatActivity
             transaction.commit();
 
         } else if (id == R.id.menu_item_newpost) {
+            toolbar.setTitle("Add Post");
             NewPostFragment newFragment = new NewPostFragment();
             newFragment.setArguments(bundle);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -124,6 +129,7 @@ public class MainActivity extends AppCompatActivity
             transaction.addToBackStack(null);
             transaction.commit();
         } else if (id == R.id.menu_item_search) {
+            toolbar.setTitle("Search");
             SearchFragment newFragment = new SearchFragment();
             newFragment.setArguments(bundle);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
