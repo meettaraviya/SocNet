@@ -1,6 +1,7 @@
 package com.lab.dbis.socnet;
 
 
+import android.app.WallpaperInfo;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -8,12 +9,15 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.ListPopupWindow;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -113,49 +117,75 @@ public class SearchFragment extends Fragment {
 
                     searchTextBox.dismissDropDown();
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(),android.R.style.Theme_Material_Dialog_Alert);
-                    builder.setTitle("Test");
-//                    builder.setIcon(R.drawable.icon);
-                    builder.setMessage("test");
-                    builder.setNeutralButton("Follow",
-                            new DialogInterface.OnClickListener()
-                            {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-                                    followUserTask = new FollowUserTask(SessionID, uid);
-                                    followUserTask.execute((Void) null);
-                                    dialog.cancel();
-                                }
-                            });
-
-                    builder.setNegativeButton("Show Posts",
-                            new DialogInterface.OnClickListener()
-                            {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-                                    dialog.cancel();
-                                    Bundle bundle = new Bundle();
-                                    bundle.putString("SessionID",SessionID);
-                                    bundle.putString("location", "SeeUserPosts");
-                                    bundle.putString("uid",uid);
-                                    ViewPostFragment newFragment = new ViewPostFragment();
-                                    newFragment.setArguments(bundle);
-                                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                    transaction.replace(R.id.fragment_placeholder, newFragment);
-                                    transaction.addToBackStack(null);
-                                    transaction.commit();
-                                }
-                            });
-
-                    builder.setPositiveButton("Cancel",
-                            new DialogInterface.OnClickListener()
-                            {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-                                    dialog.cancel();
-                                }
-                            });
-                    builder.show();
+                    String[] options = {"Follow","See Posts","Cancel"};
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(),android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
+                    builder.setItems(options, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int which) {
+                            if (which == 0) {
+                                followUserTask = new FollowUserTask(SessionID, uid);
+                                followUserTask.execute((Void) null);
+                                dialogInterface.cancel();
+                            }
+                            else if (which == 1) {
+                                dialogInterface.cancel();
+                                Bundle bundle = new Bundle();
+                                bundle.putString("SessionID",SessionID);
+                                bundle.putString("location", "SeeUserPosts");
+                                bundle.putString("uid",uid);
+                                ViewPostFragment newFragment = new ViewPostFragment();
+                                newFragment.setArguments(bundle);
+                                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                transaction.replace(R.id.fragment_placeholder, newFragment);
+                                transaction.addToBackStack(null);
+                                transaction.commit();
+                            }
+                            else {
+                                dialogInterface.cancel();
+                            }
+                        }
+                    });
+//                    builder.setNeutralButton("Follow",
+//                            new DialogInterface.OnClickListener()
+//                            {
+//                                public void onClick(DialogInterface dialog, int id)
+//                                {
+//                                    followUserTask = new FollowUserTask(SessionID, uid);
+//                                    followUserTask.execute((Void) null);
+//                                    dialog.cancel();
+//                                }
+//                            });
+//
+//                    builder.setNegativeButton("Show Posts",
+//                            new DialogInterface.OnClickListener()
+//                            {
+//                                public void onClick(DialogInterface dialog, int id)
+//                                {
+//                                    dialog.cancel();
+//                                    Bundle bundle = new Bundle();
+//                                    bundle.putString("SessionID",SessionID);
+//                                    bundle.putString("location", "SeeUserPosts");
+//                                    bundle.putString("uid",uid);
+//                                    ViewPostFragment newFragment = new ViewPostFragment();
+//                                    newFragment.setArguments(bundle);
+//                                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+//                                    transaction.replace(R.id.fragment_placeholder, newFragment);
+//                                    transaction.addToBackStack(null);
+//                                    transaction.commit();
+//                                }
+//                            });
+//
+//                    builder.setPositiveButton("Cancel",
+//                            new DialogInterface.OnClickListener()
+//                            {
+//                                public void onClick(DialogInterface dialog, int id)
+//                                {
+//                                    dialog.cancel();
+//                                }
+//                            });
+                    AlertDialog dialog = builder.create();
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.show();
 
                 }
             }
