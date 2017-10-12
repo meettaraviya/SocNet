@@ -135,8 +135,8 @@ public class SearchFragment extends Fragment {
                                 bundle.putString("uid",uid);
                                 ViewPostFragment newFragment = new ViewPostFragment();
                                 newFragment.setArguments(bundle);
-                                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                transaction.replace(R.id.fragment_placeholder, newFragment);
+                                FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+                                transaction.replace(R.id.fragment_search_view_post, newFragment);
                                 transaction.addToBackStack(null);
                                 transaction.commit();
                             }
