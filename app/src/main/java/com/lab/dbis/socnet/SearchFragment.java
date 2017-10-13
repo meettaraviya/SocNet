@@ -237,7 +237,6 @@ public class SearchFragment extends Fragment {
                                 uidMap.put(email,id);
                             }
                             adapter.notifyDataSetChanged();
-                            searchTextBox.showDropDown();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

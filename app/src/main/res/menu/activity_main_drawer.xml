@@ -10,7 +10,7 @@
             android:title="My Posts" />
         <item
             android:id="@+id/menu_item_newpost"
-            android:title="New Post" />
+            android:title="Add Post" />
         <item
             android:id="@+id/menu_item_search"
             android:title="Search" />
