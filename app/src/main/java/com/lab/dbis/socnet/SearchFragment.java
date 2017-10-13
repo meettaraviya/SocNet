@@ -69,12 +69,6 @@ public class SearchFragment extends Fragment {
                 android.R.layout.simple_dropdown_item_1line);
         searchTextBox = (AutoCompleteTextView) view.findViewById(R.id.text_search);
         final ImageButton searchButton = (ImageButton) view.findViewById(R.id.button_search);
-//        followButton = (Button) view.findViewById(R.id.button_follow);
-//        viewPostButton = (Button) view.findViewById(R.id.button_viewpost_search);
-//        cancelButton = (Button) view.findViewById(R.id.button_cancel_search);
-//        followButton.setVisibility(View.GONE);
-//        viewPostButton.setVisibility(View.GONE);
-//        cancelButton.setVisibility(View.GONE);
         searchTextBox.setThreshold(3);
         searchTextBox.setAdapter(adapter);
         searchTextBox.addTextChangedListener(new TextWatcher() {
@@ -97,9 +91,6 @@ public class SearchFragment extends Fragment {
                     searchUserTask.cancel(true);
                 searchUserTask = new SearchUserTask(SessionID, input);
                 searchUserTask.execute((Void) null);
-//                followButton.setVisibility(View.GONE);
-//                viewPostButton.setVisibility(View.GONE);
-//                cancelButton.setVisibility(View.GONE);
                 Log.i("Text Change",input);
             }
         });
@@ -110,10 +101,6 @@ public class SearchFragment extends Fragment {
                 String input = searchTextBox.getText().toString();
                 uid = uidMap.get(input);
                 if (uid != null) {
-
-//                    followButton.setVisibility(View.VISIBLE);
-//                    viewPostButton.setVisibility(View.VISIBLE);
-//                    cancelButton.setVisibility(View.VISIBLE);
 
                     searchTextBox.dismissDropDown();
 
@@ -145,44 +132,6 @@ public class SearchFragment extends Fragment {
                             }
                         }
                     });
-//                    builder.setNeutralButton("Follow",
-//                            new DialogInterface.OnClickListener()
-//                            {
-//                                public void onClick(DialogInterface dialog, int id)
-//                                {
-//                                    followUserTask = new FollowUserTask(SessionID, uid);
-//                                    followUserTask.execute((Void) null);
-//                                    dialog.cancel();
-//                                }
-//                            });
-//
-//                    builder.setNegativeButton("Show Posts",
-//                            new DialogInterface.OnClickListener()
-//                            {
-//                                public void onClick(DialogInterface dialog, int id)
-//                                {
-//                                    dialog.cancel();
-//                                    Bundle bundle = new Bundle();
-//                                    bundle.putString("SessionID",SessionID);
-//                                    bundle.putString("location", "SeeUserPosts");
-//                                    bundle.putString("uid",uid);
-//                                    ViewPostFragment newFragment = new ViewPostFragment();
-//                                    newFragment.setArguments(bundle);
-//                                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-//                                    transaction.replace(R.id.fragment_placeholder, newFragment);
-//                                    transaction.addToBackStack(null);
-//                                    transaction.commit();
-//                                }
-//                            });
-//
-//                    builder.setPositiveButton("Cancel",
-//                            new DialogInterface.OnClickListener()
-//                            {
-//                                public void onClick(DialogInterface dialog, int id)
-//                                {
-//                                    dialog.cancel();
-//                                }
-//                            });
                     AlertDialog dialog = builder.create();
                     dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     dialog.show();
