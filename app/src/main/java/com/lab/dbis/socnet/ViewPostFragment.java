@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static java.util.Collections.reverse;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -49,8 +51,8 @@ public class ViewPostFragment extends Fragment {
     }
 
     public void updateOffset(int offset) {
-        if (this.offset == 0 && offset > 0)
-            postListView.setSelectedGroup(offset-1);
+        if (offset > this.offset)
+            postListView.setSelectedGroup(offset - this.offset - 1);
         if (this.offset == offset)
             reachedTop = true;
         this.offset = offset;
@@ -103,7 +105,6 @@ public class ViewPostFragment extends Fragment {
         postListAdapter = new PostListAdapter(postList,commentList,getContext(), SessionID);
         postListView.setAdapter(postListAdapter);
         postListView.setGroupIndicator(null);
-        postListView.setStackFromBottom(true);
         return view;
     }
 
@@ -135,10 +136,12 @@ public class ViewPostFragment extends Fragment {
             try {
 
                 JSONArray jsonPostArray = response.getJSONArray("data");
+                reverse(postList);
                 for(int i=0; i<jsonPostArray.length(); i++) {
                     postList.add(new Post(jsonPostArray.getJSONObject(i)));
                     commentList.add(null);
                 }
+                reverse(postList);
                 int postCount = jsonPostArray.length();
                 int previousOffset = Integer.parseInt(offset);
                 newOffset = previousOffset + postCount;
