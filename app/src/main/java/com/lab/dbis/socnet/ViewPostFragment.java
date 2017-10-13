@@ -137,7 +137,7 @@ public class ViewPostFragment extends Fragment {
                 JSONArray jsonPostArray = response.getJSONArray("data");
                 for(int i=0; i<jsonPostArray.length(); i++) {
                     postList.add(new Post(jsonPostArray.getJSONObject(i)));
-                    commentList.add(false);
+                    commentList.add(null);
                 }
                 int postCount = jsonPostArray.length();
                 int previousOffset = Integer.parseInt(offset);

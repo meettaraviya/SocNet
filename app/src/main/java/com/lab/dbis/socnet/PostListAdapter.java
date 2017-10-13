@@ -62,7 +62,10 @@ public class PostListAdapter extends BaseExpandableListAdapter {
             LayoutInflater inflater = (LayoutInflater)context.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.list_item_post, parent, false);
-            ((ExpandableListView) parent).expandGroup(groupPosition,false);
+        }
+        if (commentList.get(groupPosition) == null) {
+            ((ExpandableListView) parent).expandGroup(groupPosition, false);
+            commentList.set(groupPosition, false);
         }
         Post post = postList.get(groupPosition);
         TextView postUserName = (TextView) convertView.findViewById(R.id.text_post_name);
@@ -71,7 +74,7 @@ public class PostListAdapter extends BaseExpandableListAdapter {
         ImageView postImage = (ImageView) convertView.findViewById(R.id.image_post);
 
         final EditText editTextComment = (EditText) convertView.findViewById(R.id.edittext_post_new_comment);
-        Button buttonViewComments = (Button) convertView.findViewById(R.id.button_post_view_comments);
+        final Button buttonViewComments = (Button) convertView.findViewById(R.id.button_post_view_comments);
         Button buttonAddComment = (Button) convertView.findViewById(R.id.button_post_add_comment);
 
         postUserName.setText(post.getName());
@@ -129,7 +132,10 @@ public class PostListAdapter extends BaseExpandableListAdapter {
     @Override
     public int getChildrenCount(int groupPosition) {
         int totalComments =  postList.get(groupPosition).commentListSize();
-        if (commentList.get(groupPosition) == false) {
+        if (commentList.get(groupPosition) == null) {
+            return Math.min(totalComments,3);
+        }
+        else if (commentList.get(groupPosition) == false) {
             return Math.min(totalComments,3);
         }
         else {
